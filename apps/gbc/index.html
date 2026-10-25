@@ -1,0 +1,188 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>ふわぁ エミュレーター v0.23</title><style>
+*{box-sizing:border-box}html,body{margin:0;background:#15191d;color:#f3ead8;font-family:system-ui,sans-serif}body{overscroll-behavior:none}.shell{max-width:500px;margin:auto;min-height:100dvh;padding:12px 14px 20px;background:#30363e}header{display:flex;justify-content:space-between;align-items:center;gap:10px}a{color:#e9ca86}h1{font-size:16px;margin:0}.status{font-size:12px;line-height:1.6;background:#1e252c;border-radius:8px;padding:7px;margin:10px 0}.frame{background:#0d1015;border:7px solid #12151a;border-radius:14px;padding:6px;max-width:100%;margin:0 auto}.screen{aspect-ratio:160/144;position:relative;overflow:hidden;background:#080b0e;image-rendering:pixelated}.screen.gba{aspect-ratio:240/160}#game{position:absolute;inset:0;width:100%;height:100%}#game canvas{image-rendering:pixelated!important}
+/* v0.16: EmulatorJS標準の半透明タッチパッドだけを隠す。独自の下部操作盤は対象外。 */
+#game [class*="virtualGamepad"],#game [class*="virtual-gamepad"],#game [class*="virtual_gamepad"],#game [class*="ejs_gamepad"],#game [class*="ejs-gamepad"],#game [id*="virtualGamepad"],#game [id*="virtual-gamepad"]{display:none!important}.controls{position:relative;height:268px;touch-action:none;user-select:none;-webkit-user-select:none}.key{position:absolute;display:grid;place-items:center;border:2px solid #88919a;background:#4a5561;color:#fff;font-weight:800;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent}.key.pressed{background:#e3bd72;color:#191d21;transform:scale(.96)}.dpad{position:absolute;left:4%;top:25px;width:150px;height:150px}.dpad .key{width:50px;height:50px;border-radius:7px}.up{left:50px;top:0}.left{left:0;top:50px}.right{left:100px;top:50px}.down{left:50px;top:100px}.diag{opacity:.4;font-size:10px}.ul{left:0;top:0}.ur{left:100px;top:0}.dl{left:0;top:100px}.dr{left:100px;top:100px}.a,.b{width:65px;height:65px;border-radius:50%;background:#6d344a;border-color:#a66b7e;font-size:23px}.a{right:4%;top:33px}.b{right:23%;top:78px}.select,.start{height:34px;width:84px;border-radius:20px;font-size:11px;background:#50535b;top:197px}.select{left:calc(50% - 91px)}.start{left:calc(50% + 7px)}.l,.r{width:74px;height:37px;border-radius:12px;top:236px;background:#4d5a66}.l{left:4%}.r{right:4%}.controls:not(.gba) .shoulder{display:none}.actions{display:flex;gap:8px;margin:9px 0}.actions button{flex:1;padding:11px 5px;background:#bd9b60;color:#15191d;border:0;border-radius:9px;font-weight:800;cursor:pointer}.actions button:disabled{opacity:.5}.info{font-size:11px;color:#cbd0d4;text-align:center;line-height:1.6}.gamepad-status{font-size:11px;text-align:center;color:#cbd0d4;min-height:18px;margin:3px 0 8px}.footer{text-align:center;font-size:11px;padding-top:10px}@media(max-width:390px){.dpad{transform:scale(.84);transform-origin:top left}.a{right:2%}.b{right:23%}}@media(min-width:700px){.shell{margin:18px auto;border-radius:20px}}
+
+/* 色味の変更は描画キャンバスだけに限定する。 */
+#game.gbc-vivid canvas{filter:saturate(1.3) contrast(1.055)}
+.color-setting{position:absolute;top:235px;left:auto;right:4%;display:flex;align-items:center;justify-content:flex-start;gap:4px;margin:0;font-size:10px;z-index:2;white-space:nowrap}
+.color-setting[hidden]{display:none!important}.color-setting select{background:#1e252c;color:#f3ead8;border:1px solid #88919a;border-radius:6px;padding:5px 2px;font:inherit;max-width:105px}.controls:has(.color-setting:not([hidden])){height:284px}#game.gb-colorized canvas{filter:sepia(.8) saturate(1.7) hue-rotate(345deg) contrast(1.06)}@media(max-width:390px){.color-setting{left:auto;right:2%;font-size:9px;gap:3px}.color-setting select{max-width:96px}}
+</style><link rel="manifest" href="manifest.webmanifest?v=024"><meta name="theme-color" content="#493d86"><link rel="icon" href="icon-192.png"></head><body><main class="shell"><header><a href="../../index.html">← ゲーム一覧へ</a><h1 id="title">ふわぁ エミュレーター</h1></header><div class="status" id="status" role="status">準備中…</div><div class="actions"><button id="boot" type="button">▶ ゲーム起動・再試行</button><button id="reset" type="button">↻ リセット</button></div><div class="frame"><div class="screen" id="screen"><div id="game"></div></div></div><div class="controls" id="controls" aria-label="ゲーム操作ボタン"><div class="dpad"><button class="key up" data-keys="4" aria-label="上">▲</button><button class="key down" data-keys="5" aria-label="下">▼</button><button class="key left" data-keys="6" aria-label="左">◀</button><button class="key right" data-keys="7" aria-label="右">▶</button><button class="key diag ul" data-keys="4,6" aria-label="左上">↖</button><button class="key diag ur" data-keys="4,7" aria-label="右上">↗</button><button class="key diag dl" data-keys="5,6" aria-label="左下">↙</button><button class="key diag dr" data-keys="5,7" aria-label="右下">↘</button></div><button class="key a" data-keys="8">A</button><button class="key b" data-keys="0">B</button><button class="key select" data-keys="2">SELECT</button><button class="key start" data-keys="3">START</button><div class="color-setting" id="colorSetting" hidden><label id="colorLabel" for="gbcColor">GBCの色味</label><select id="gbcColor"><option value="normal">現在の色</option><option value="vivid">鮮やか</option></select></div><button class="key shoulder l" data-keys="10">L</button><button class="key shoulder r" data-keys="11">R</button></div><div id="gamepadStatus" class="gamepad-status" role="status" aria-live="polite">USB / Bluetoothゲームパッド：接続待ち</div><div class="info">スマホ：タッチ・ゲームパッド / PC：マウス・キーボード<br>ボタンは長押し・同時押し対応。ROM選択は不要です。</div><div class="footer">Ver.0.21 · <a href="../../licenses.html">ライセンス・著作権</a></div></main><script>
+'use strict';
+const defs={gb:{name:'ふわぁ チンチロ',core:'gambatte',rom:'../../roms/Fuwaa_Chinchiro.gb'},gbc:{name:'ふわぁ テキポ',core:'gambatte',rom:'../../roms/Fuwaa_Tekipov1.16.gbc'},gba:{name:'ふわぁ テキポ GBA版',core:'mgba',rom:'../../roms/Fuwaa_Tekipo_GBA.gba'}};
+const requested='gbc';const mode=Object.prototype.hasOwnProperty.call(defs,requested)?requested:'gb';const def=defs[mode];
+// GBはGB風/カラー風の画面表示、GBCは通常/鮮やかを切り替える。
+// いずれもROM・エミュレーターの内部パレットには手を加えない。
+if(mode==='gbc'||mode==='gb'){
+ const setting=document.getElementById('colorSetting');
+ const picker=document.getElementById('gbcColor');
+ const label=document.getElementById('colorLabel');
+ const key=mode==='gb'?'fuwaa-gb-color-v019':'fuwaa-gbc-color';
+ setting.hidden=false;
+ if(mode==='gb'){
+  label.textContent='GBの色味';
+  picker.innerHTML='<option value="normal">GBカラー</option><option value="vivid">GBCカラー</option>';
+ }
+ let stored=mode==='gb'?'vivid':'normal';
+ try{stored=localStorage.getItem(key)||(mode==='gb'?'vivid':'normal');}catch(e){}
+ picker.value=stored==='vivid'?'vivid':'normal';
+ const apply=()=>{
+  document.getElementById('game').classList.toggle('gbc-vivid',mode==='gbc'&&picker.value==='vivid');
+  document.getElementById('game').classList.toggle('gb-colorized',mode==='gb'&&picker.value==='normal');
+  try{localStorage.setItem(key,picker.value);}catch(e){}
+ };
+ picker.addEventListener('change',apply);
+ apply();
+}
+
+document.querySelector('#title').textContent=def.name;document.querySelector('#screen').classList.toggle('gba',mode==='gba');document.querySelector('#controls').classList.toggle('gba',mode==='gba');const status=document.querySelector('#status');const boot=document.querySelector('#boot');const reset=document.querySelector('#reset');
+// EmulatorJS GameManager simulateInput(buttonIndex, 1=down / 0=up).
+// EmulatorJSのバージョンでAPIが変わる場合は、ここを検証・調整する。
+const active=new Map(), counts=new Map();
+function gameManager(){return window.EJS_emulator?.gameManager || null;}
+function send(index,pressed){const gm=gameManager();if(gm&&typeof gm.simulateInput==='function'){try{gm.simulateInput(0,index,pressed?1:0);return true;}catch(e){console.warn('入力送信失敗',e);}}return false;}
+function setInput(source,keys){const before=active.get(source)||[];const next=keys||[];for(const k of before){const n=(counts.get(k)||1)-1;if(n<=0){counts.delete(k);send(k,false);}else counts.set(k,n);}if(next.length){active.set(source,next);for(const k of next){const n=counts.get(k)||0;counts.set(k,n+1);if(n===0)send(k,true);}}else active.delete(source);}
+function resendHeld(){for(const k of counts.keys())send(k,true);}
+const keysByPointer=new Map();
+for(const btn of document.querySelectorAll('.key')){
+ const codes=btn.dataset.keys.split(',').map(Number);
+ btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);const id='p'+e.pointerId;keysByPointer.set(id,btn);btn.classList.add('pressed');setInput(id,codes);});
+ const release=e=>{const id='p'+e.pointerId;if(keysByPointer.get(id)!==btn)return;keysByPointer.delete(id);btn.classList.remove('pressed');setInput(id,[]);};
+ btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('lostpointercapture',release);btn.addEventListener('contextmenu',e=>e.preventDefault());
+}
+const keyboard={ArrowUp:4,ArrowDown:5,ArrowLeft:6,ArrowRight:7,z:8,x:0,Enter:3,Shift:2,a:10,s:11};
+document.addEventListener('keydown',e=>{const k=keyboard[e.key];if(k===undefined)return;e.preventDefault();if(!e.repeat)setInput('k'+e.code,[k]);});document.addEventListener('keyup',e=>{if(keyboard[e.key]!==undefined){e.preventDefault();setInput('k'+e.code,[]);}});
+window.addEventListener('blur',()=>{for(const id of [...active.keys()])setInput(id,[]);document.querySelectorAll('.pressed').forEach(b=>b.classList.remove('pressed'));keysByPointer.clear();});
+// Gamepad API: USB / Bluetooth / 2.4GHz receivers supported when the browser exposes them.
+// Keep touch and keyboard input independent; all sources use the same reference-counted input path.
+const gamepadStatus=document.getElementById('gamepadStatus');
+const padSources=new Set();
+const padButtonMap={0:8,1:0,8:2,9:3,4:10,5:11}; // standard: A B SELECT START L R
+const padDeadzone=0.48, padReleaseZone=0.32;
+const padAxisState=new Map();
+let padLastMessage='';
+function padMessage(message){if(message!==padLastMessage){padLastMessage=message;gamepadStatus.textContent=message;}}
+function releasePads(){for(const source of padSources)setInput(source,[]);padSources.clear();padAxisState.clear();}
+function pollPads(){
+ try{
+  const pads=typeof navigator.getGamepads==='function'?navigator.getGamepads():[];
+  const present=new Set();let connected=0;
+  for(const pad of pads||[]){
+   if(!pad||!pad.connected)continue;
+   connected++;
+   const source='gamepad:'+pad.index;present.add(source);
+   const down=i=>Boolean(pad.buttons?.[i]?.pressed || (pad.buttons?.[i]?.value||0)>0.5);
+   const codes=new Set();
+   for(const [button,code] of Object.entries(padButtonMap))if(down(Number(button)))codes.add(code);
+   // D-pad standard mapping, plus left analog stick with hysteresis to avoid jitter.
+   const old=padAxisState.get(source)||{x:0,y:0};
+   const axis=(value,prev)=>value>padDeadzone?1:value< -padDeadzone?-1:Math.abs(value)<padReleaseZone?0:prev;
+   const x=axis(pad.axes?.[0]||0,old.x),y=axis(pad.axes?.[1]||0,old.y);
+   padAxisState.set(source,{x,y});
+   if(down(12)||y<0)codes.add(4);
+   if(down(13)||y>0)codes.add(5);
+   if(down(14)||x<0)codes.add(6);
+   if(down(15)||x>0)codes.add(7);
+   // Do not resend unchanged held buttons every frame.
+   const next=[...codes],oldKeys=active.get(source)||[];
+   if(next.length!==oldKeys.length||next.some(k=>!oldKeys.includes(k)))setInput(source,next);
+   padSources.add(source);
+  }
+  for(const source of [...padSources])if(!present.has(source)){
+   setInput(source,[]);padSources.delete(source);padAxisState.delete(source);
+  }
+  padMessage(connected?`ゲームパッド接続中：${connected}台（A/B・十字キー・STARTを確認）`:'USB / Bluetoothゲームパッド：接続待ち（ボタンを押すと認識する場合があります）');
+ }catch(error){padMessage('ゲームパッド入力を確認できません：ブラウザの対応をご確認ください');}
+ requestAnimationFrame(pollPads);
+}
+window.addEventListener('gamepadconnected',()=>{padMessage('ゲームパッドを検出しました。ボタンを押して確認してください');});
+window.addEventListener('gamepaddisconnected',()=>{releasePads();padMessage('ゲームパッドが切断されました');});
+window.addEventListener('blur',releasePads);
+requestAnimationFrame(pollPads);
+
+let loading=false,started=false;
+function finishStartup(){}
+
+// EmulatorJS 4.2.3: game canvasに重なる標準UIのみを非表示にする。
+// ライブラリの内部DOM名は版ごとに異なるため、ラベルも検査する。
+// 外側の独自操作盤には一切触れない。
+const standardUiSelectors=[
+ '[class*="virtualGamepad"]','[class*="virtual-gamepad"]','[class*="virtual_gamepad"]',
+ '[class*="ejs_gamepad"]','[class*="ejs-gamepad"]',
+ '[class*="ejs_virtual"]','[class*="ejs-virtual"]',
+ '[id*="virtualGamepad"]','[id*="virtual-gamepad"]'
+].join(',');
+function hideStandardUi(){
+ const root=document.getElementById('game');if(!root)return;
+ root.querySelectorAll(standardUiSelectors).forEach(el=>{if(!el.contains(root.querySelector('canvas')))el.style.setProperty('display','none','important');});
+ const nodes=[...root.querySelectorAll('button,[role="button"],span,div')];
+ const text=el=>el.children.length===0?(el.textContent||'').trim():'';
+ // メニューの見出しではなく実際の選択肢が同居する最小の容器を探す。
+ const restart=nodes.find(el=>/^Restart$/i.test(text(el)));
+ if(restart){
+  let parent=restart.parentElement;
+  for(let i=0;parent&&parent!==root&&i<7;i++,parent=parent.parentElement){
+   const t=parent.textContent||'';
+   if(/Save State/i.test(t)&&/Load State/i.test(t)&&/Settings/i.test(t)&&!parent.querySelector('canvas')){
+    parent.style.setProperty('display','none','important');break;
+   }
+  }
+ }
+ // タッチ操作の文字が揃うレイヤーのみ対象（ゲーム描画canvasは除外）。
+ const fast=nodes.find(el=>/^Fast$/i.test(text(el)));
+ if(fast){let parent=fast.parentElement;
+  for(let i=0;parent&&parent!==root&&i<7;i++,parent=parent.parentElement){
+   const t=parent.textContent||'';
+   if(/Slow/.test(t)&&/Select/.test(t)&&/Start/.test(t)&&!parent.querySelector('canvas')){
+    parent.style.setProperty('display','none','important');break;
+   }
+  }
+ }
+}
+let uiWatcher=null;
+function watchStartupUi(){
+ const root=document.getElementById('game');
+ if(uiWatcher)uiWatcher.disconnect();
+ let queued=false;
+ uiWatcher=new MutationObserver(()=>{
+  if(queued)return;queued=true;
+  requestAnimationFrame(()=>{queued=false;hideStandardUi();});
+ });
+ uiWatcher.observe(root,{childList:true,subtree:true});
+ hideStandardUi();
+ // 起動時のDOM構築が済んだら監視終了。常時監視による負荷を避ける。
+ setTimeout(()=>{uiWatcher?.disconnect();uiWatcher=null;hideStandardUi();},12000);
+}
+function releaseAll(){for(const id of [...active.keys()])setInput(id,[]);document.querySelectorAll('.pressed').forEach(b=>b.classList.remove('pressed'));keysByPointer.clear();}
+async function startGame(){
+ if(loading||started)return;
+ if(location.protocol==='file:'){status.textContent='ローカルサーバーが必要です。「PCで起動.bat」をダブルクリックしてください。';return;}
+ loading=true;boot.disabled=true;status.textContent='ROMを確認中：'+def.rom;
+ try{
+  // EmulatorJS EJS_gameUrl must be an accessible URL, not a File object.
+  window.EJS_player='#game';window.EJS_core=def.core;
+  window.EJS_gameUrl=new URL(def.rom,location.href).href;
+  window.EJS_gameName=def.name;
+  window.EJS_pathtodata='https://cdn.emulatorjs.org/4.2.3/data/';
+  window.EJS_startOnLoaded=true;window.EJS_Buttons={playPause:false, restart:false, mute:false, settings:false, fullscreen:false, saveState:false, loadState:false, screenRecord:false, gamepad:false, cheat:false, volume:false, saveSavFiles:false, loadSavFiles:false, quickSave:false, quickLoad:false, screenshot:false, cacheManager:false};window.EJS_browserMode='desktop';window.EJS_language='ja-JP';
+  window.EJS_biosUrl='';window.EJS_controlScheme=mode==='gba'?'gba':'gb';
+  // 標準タッチパッドは使わず、ページ独自のボタンからsimulateInputする。
+  window.EJS_disableVirtualGamepad=true;
+  window.EJS_VirtualGamepadSettings={};
+  status.textContent='ROM確認完了。エミュレーターを読み込み中…';
+  const script=document.createElement('script');
+  script.src='https://cdn.emulatorjs.org/4.2.3/data/loader.js';
+  script.onerror=()=>{finishStartup();loading=false;boot.disabled=false;status.textContent='EmulatorJSの読み込みに失敗しました。インターネット接続を確認して「ゲーム起動・再試行」を押してください。';script.remove();};
+  document.body.append(script);started=true;watchStartupUi();
+  let attempts=0;const timer=setInterval(()=>{
+   attempts++;
+   if(gameManager()?.simulateInput){clearInterval(timer);finishStartup();hideStandardUi();status.textContent='入力接続完了：'+def.name+'（A/B・方向キーを確認してください）';resendHeld();}
+   else if(attempts>=40){clearInterval(timer);finishStartup();status.textContent='エミュレーター読込済み。画面内に開始表示がある場合は押してください。入力未接続の場合は調整が必要です。';}
+  },500);
+ }catch(e){finishStartup();loading=false;boot.disabled=false;status.textContent=e.message+'。roms フォルダー内のファイル名を確認してください。';}
+}
+boot.addEventListener('click',startGame);
+reset.addEventListener('click',()=>{if(confirm('ゲームをリセットしますか？ 未保存の進行状況は失われます。')){releaseAll();location.reload();}});
+if(location.protocol==='file:')status.textContent='PCでは「PCで起動.bat」から開いてください。';
+else startGame();
+</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}</script></body></html>
