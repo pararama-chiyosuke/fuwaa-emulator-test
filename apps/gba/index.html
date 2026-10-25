@@ -7,7 +7,7 @@
 #game.gbc-vivid canvas{filter:saturate(1.3) contrast(1.055)}
 .color-setting{position:absolute;top:235px;left:auto;right:4%;display:flex;align-items:center;justify-content:flex-start;gap:4px;margin:0;font-size:10px;z-index:2;white-space:nowrap}
 .color-setting[hidden]{display:none!important}.color-setting select{background:#1e252c;color:#f3ead8;border:1px solid #88919a;border-radius:6px;padding:5px 2px;font:inherit;max-width:105px}.controls:has(.color-setting:not([hidden])){height:284px}#game.gb-colorized canvas{filter:sepia(.8) saturate(1.7) hue-rotate(345deg) contrast(1.06)}@media(max-width:390px){.color-setting{left:auto;right:2%;font-size:9px;gap:3px}.color-setting select{max-width:96px}}
-</style><link rel="manifest" href="manifest.webmanifest?v=028"><meta name="theme-color" content="#99532f"><link rel="icon" href="icon-192.png"></head><body><main class="shell"><header><h1 id="title">ふわぁ エミュレーター</h1></header><div class="status" id="status" role="status">準備中…</div><div class="actions"><button id="boot" type="button">▶ ゲーム起動・再試行</button><button id="reset" type="button">↻ リセット</button></div><div class="frame"><div class="screen" id="screen"><div id="game"></div></div></div><div class="controls" id="controls" aria-label="ゲーム操作ボタン"><div class="dpad"><button class="key up" data-keys="4" aria-label="上">▲</button><button class="key down" data-keys="5" aria-label="下">▼</button><button class="key left" data-keys="6" aria-label="左">◀</button><button class="key right" data-keys="7" aria-label="右">▶</button><button class="key diag ul" data-keys="4,6" aria-label="左上">↖</button><button class="key diag ur" data-keys="4,7" aria-label="右上">↗</button><button class="key diag dl" data-keys="5,6" aria-label="左下">↙</button><button class="key diag dr" data-keys="5,7" aria-label="右下">↘</button></div><button class="key a" data-keys="8">A</button><button class="key b" data-keys="0">B</button><button class="key select" data-keys="2">SELECT</button><button class="key start" data-keys="3">START</button><div class="color-setting" id="colorSetting" hidden><label id="colorLabel" for="gbcColor">GBCの色味</label><select id="gbcColor"><option value="normal">現在の色</option><option value="vivid">鮮やか</option></select></div><button class="key shoulder l" data-keys="10">L</button><button class="key shoulder r" data-keys="11">R</button></div><div class="wake-area"><button type="button" id="wake" aria-label="白画面のときここをタップ">画面が白いときはここをタップ</button></div><div id="gamepadStatus" class="gamepad-status" role="status" aria-live="polite">USB / Bluetoothゲームパッド：接続待ち</div><div class="info">スマホ：タッチ・ゲームパッド / PC：マウス・キーボード<br>ボタンは長押し・同時押し対応。ROM選択は不要です。</div><div class="footer">Ver.0.31 · <a href="../../licenses.html">ライセンス・著作権</a></div></main><script>
+</style><link rel="manifest" href="manifest.webmanifest?v=028"><meta name="theme-color" content="#99532f"><link rel="icon" href="icon-192.png"></head><body><main class="shell"><header><h1 id="title">ふわぁ エミュレーター</h1></header><div class="status" id="status" role="status">準備中…</div><div class="actions"><button id="boot" type="button">▶ ゲーム起動・再試行</button><button id="reset" type="button">↻ リセット</button></div><div class="frame"><div class="screen" id="screen"><div id="game"></div></div></div><div class="controls" id="controls" aria-label="ゲーム操作ボタン"><div class="dpad"><button class="key up" data-keys="4" aria-label="上">▲</button><button class="key down" data-keys="5" aria-label="下">▼</button><button class="key left" data-keys="6" aria-label="左">◀</button><button class="key right" data-keys="7" aria-label="右">▶</button><button class="key diag ul" data-keys="4,6" aria-label="左上">↖</button><button class="key diag ur" data-keys="4,7" aria-label="右上">↗</button><button class="key diag dl" data-keys="5,6" aria-label="左下">↙</button><button class="key diag dr" data-keys="5,7" aria-label="右下">↘</button></div><button class="key a" data-keys="8">A</button><button class="key b" data-keys="0">B</button><button class="key select" data-keys="2">SELECT</button><button class="key start" data-keys="3">START</button><div class="color-setting" id="colorSetting" hidden><label id="colorLabel" for="gbcColor">GBCの色味</label><select id="gbcColor"><option value="normal">現在の色</option><option value="vivid">鮮やか</option></select></div><button class="key shoulder l" data-keys="10">L</button><button class="key shoulder r" data-keys="11">R</button></div><div id="gamepadStatus" class="gamepad-status" role="status" aria-live="polite">USB / Bluetoothゲームパッド：接続待ち</div><div class="info">スマホ：タッチ・ゲームパッド / PC：マウス・キーボード<br>ボタンは長押し・同時押し対応。ROM選択は不要です。</div><div class="footer">Ver.0.32 · <a href="../../licenses.html">ライセンス・著作権</a></div></main><script>
 'use strict';
 const defs={gb:{name:'ふわぁ チンチロ',core:'gambatte',rom:'../../roms/Fuwaa_Chinchiro.gb'},gbc:{name:'ふわぁ テキポ',core:'gambatte',rom:'../../roms/Fuwaa_Tekipov1.16.gbc'},gba:{name:'ふわぁ テキポ GBA版',core:'mgba',rom:'../../roms/Fuwaa_Tekipo_GBA.gba'}};
 const requested='gba';const mode=Object.prototype.hasOwnProperty.call(defs,requested)?requested:'gb';const def=defs[mode];
@@ -176,13 +176,26 @@ async function startGame(){
   document.body.append(script);started=true;watchStartupUi();
   let attempts=0;const timer=setInterval(()=>{
    attempts++;
-   if(gameManager()?.simulateInput){clearInterval(timer);finishStartup();hideStandardUi();status.textContent='入力接続完了：'+def.name+'（A/B・方向キーを確認してください）';resendHeld();}
+   if(gameManager()?.simulateInput){clearInterval(timer);finishStartup();hideStandardUi();scheduleStartupRefresh();status.textContent='入力接続完了：'+def.name+'（A/B・方向キーを確認してください）';resendHeld();}
    else if(attempts>=40){clearInterval(timer);finishStartup();status.textContent='エミュレーター読込済み。画面内に開始表示がある場合は押してください。入力未接続の場合は調整が必要です。';}
   },500);
  }catch(e){finishStartup();loading=false;boot.disabled=false;status.textContent=e.message+'。roms フォルダー内のファイル名を確認してください。';}
 }
+// v0.32: refresh the renderer after EmulatorJS becomes ready, without synthetic taps or reloads.
+// Some Android shortcut launches need a layout update after the canvas is attached.
+let startupRefreshScheduled=false;
+function scheduleStartupRefresh(){
+ if(startupRefreshScheduled)return;
+ startupRefreshScheduled=true;
+ [0,250,800,1600].forEach(delay=>setTimeout(()=>{
+  if(document.hidden)return;
+  requestAnimationFrame(()=>{
+   window.dispatchEvent(new Event('resize'));
+   try{window.EJS_emulator?.resize?.();}catch(e){}
+  });
+ },delay));
+}
 window.addEventListener('pageshow',()=>{setTimeout(()=>{window.dispatchEvent(new Event('resize'));try{window.EJS_emulator?.resize?.();}catch(e){}},550);});
-document.getElementById('wake').addEventListener('click',()=>{window.dispatchEvent(new Event('resize'));try{window.EJS_emulator?.resize?.();}catch(e){} if(!started)startGame();});
 boot.addEventListener('click',startGame);
 reset.addEventListener('click',()=>{if(confirm('ゲームをリセットしますか？ 未保存の進行状況は失われます。')){releaseAll();location.reload();}});
 if(location.protocol==='file:')status.textContent='PCでは「PCで起動.bat」から開いてください。';
