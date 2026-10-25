@@ -3,7 +3,7 @@
   "name": "ふわぁ テキポ GBA",
   "short_name": "テキポGBA",
   "description": "ふわぁ テキポ GBAを直接起動します。通信接続が必要です。",
-  "start_url": "./index.html",
+  "start_url": "./index.html?installed=1",
   "scope": "/fuwaa-emulator-test/apps/gba/",
   "display": "standalone",
   "background_color": "#16191e",

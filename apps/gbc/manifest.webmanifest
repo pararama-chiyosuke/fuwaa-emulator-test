@@ -3,7 +3,7 @@
   "name": "ふわぁ テキポ",
   "short_name": "テキポ",
   "description": "ふわぁ テキポを直接起動します。通信接続が必要です。",
-  "start_url": "./index.html",
+  "start_url": "./index.html?installed=1",
   "scope": "/fuwaa-emulator-test/apps/gbc/",
   "display": "standalone",
   "background_color": "#16191e",
