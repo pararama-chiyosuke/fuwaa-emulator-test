@@ -3,11 +3,12 @@
 </style></head><body><main><p><a href="../index.html">← お試し所へ戻る</a></p><h1>🎮 ゲーム別アイコン<br>Ver.0.28</h1><p>好きなゲームをスマホのホーム画面から起動できます。<strong>アプリとして追加</strong>を選べます。</p><div class="toast" id="message" hidden role="status"></div>
 <section class="game" data-game="gb"><div class="gamehead"><img src="gb/icon-192.png" alt="チンチロのアイコン"><div><h2>ふわぁ チンチロ</h2><div class="system">GAME BOY</div></div></div><div class="buttons"><button class="primary" data-install="gb">アプリとして追加</button></div><div class="notice" id="note-gb"></div></section>
 <section class="game" data-game="gbc"><div class="gamehead"><img src="gbc/icon-192.png" alt="テキポGBCのアイコン"><div><h2>ふわぁ テキポ</h2><div class="system">GAME BOY COLOR</div></div></div><div class="buttons"><button class="primary" data-install="gbc">アプリとして追加</button></div><div class="notice" id="note-gbc"></div></section>
+<section class="game" data-game="gbc15"><div class="gamehead"><img src="gbc15/icon-192.png" alt="テキポ Ver.1.5のアイコン"><div><h2>ふわぁ テキポ Ver.1.5</h2><div class="system">GAME BOY COLOR</div></div></div><div class="buttons"><button class="primary" data-install="gbc15">アプリとして追加</button></div><div class="notice" id="note-gbc15"></div></section>
 <section class="game" data-game="gba"><div class="gamehead"><img src="gba/icon-192.png" alt="テキポGBAのアイコン"><div><h2>ふわぁ テキポ GBA版</h2><div class="system">GAME BOY ADVANCE</div></div></div><div class="buttons"><button class="primary" data-install="gba">アプリとして追加</button></div><div class="notice" id="note-gba"></div></section>
 <p class="small">※ アプリのインストール画面はChromeが対応時に表示します。ブラウザーやインストール状況により、手動操作が必要です。ゲームには通信接続が必要です。</p>
 </main><script>
-const keys=['gb','gbc','gba'];
-const names={gb:'ふわぁ チンチロ',gbc:'ふわぁ テキポ',gba:'ふわぁ テキポ GBA版'};
+const keys=['gb','gbc','gbc15','gba'];
+const names={gb:'ふわぁ チンチロ',gbc:'ふわぁ テキポ',gbc15:'ふわぁ テキポ Ver.1.5',gba:'ふわぁ テキポ GBA版'};
 const pending={};
 function message(t){const m=document.getElementById('message');m.textContent=t;m.hidden=false;}
 // The install prompt belongs to the CURRENT document. A parent listing cannot

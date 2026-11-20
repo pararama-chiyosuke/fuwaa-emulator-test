@@ -1,0 +1,37 @@
+{
+  "id": "/fuwaa-emulator-test/apps/gbc15/",
+  "name": "ふわぁ テキポ Ver.1.5",
+  "short_name": "テキポ1.5",
+  "description": "ふわぁ テキポ Ver.1.5を直接起動します。通信接続が必要です。",
+  "start_url": "./index.html?installed=1",
+  "scope": "/fuwaa-emulator-test/apps/gbc15/",
+  "display": "standalone",
+  "background_color": "#16191e",
+  "theme_color": "#493d86",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
